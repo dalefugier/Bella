@@ -64,10 +64,10 @@ namespace Bella.Components
       if (both_sides)
       {
         var xform = Transform.Translation(-normal * distance);
-        distance *= 2;
         var offset_curve = curve.DuplicateCurve();
         offset_curve.Transform(xform);
         curve = offset_curve;
+        distance *= 2.0;
       }
 
       // Create a surface by extruding the curve

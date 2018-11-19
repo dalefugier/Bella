@@ -14,8 +14,8 @@ namespace Bella
 
     public override Guid Id => new Guid("765a4d39-9719-4ce4-8019-88d459842433");
 
-    public override string AuthorName => "Dale Fugier";
+    public override string AuthorName => "Robert McNeel & Associates";
 
-    public override string AuthorContact => "https://github.com/dalefugier";
+    public override string AuthorContact => "https://github.com/dalefugier/Bella";
   }
 }
