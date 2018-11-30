@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Remoting.Messaging;
 using Grasshopper.Kernel;
 using Rhino;
 using Rhino.Geometry;
@@ -18,6 +19,7 @@ namespace Bella.Components
       input.AddNumberParameter("Distance", "D", "Extrusion distance", GH_ParamAccess.item, 1.0);
       input.AddBooleanParameter("BothSides", "B", "Extrude curve on both sides", GH_ParamAccess.item, false);
       input.AddBooleanParameter("Solid", "S", "Create a closed solid if curve is closed", GH_ParamAccess.item, false);
+      input.AddBooleanParameter("Up", "U", "Extrude in up direction", GH_ParamAccess.item, false);
     }
 
     protected override void RegisterOutputParams(GH_OutputParamManager output)
@@ -36,7 +38,7 @@ namespace Bella.Components
         return;
 
       // Verify curve is planar
-      if (!curve.TryGetPlane(out Plane plane, tolerance))
+      if (!curve.TryGetPlane(out var plane, tolerance))
       {
         AddRuntimeMessage(GH_RuntimeMessageLevel.Error, "Curve is not planar");
         return;
@@ -54,9 +56,21 @@ namespace Bella.Components
       var solid = false;
       if (!data.GetData(3, ref solid)) return;
 
+      // Extrude up
+      var up = false;
+      if (!data.GetData(4, ref up)) return;
+
       // Extrusion direction
       var normal = plane.Normal;
       normal.Unitize();
+
+      if (up)
+      {
+        // If zaxis points down, flip it
+        var z_zero = IsZero(plane.ZAxis.Z);
+        if (!z_zero && IsLessThanZero(plane.ZAxis.Z))
+          normal.Reverse();
+      }
 
       // If extruding boths sides, offset the curve in the -normal
       // direction by the specified distance, and then double the
@@ -106,6 +120,16 @@ namespace Bella.Components
 
       // Set result
       data.SetData(0, brep);
+    }
+
+    private static bool IsZero(double d)
+    {
+      return Math.Abs(d) < 0.001;
+    }
+
+    private static bool IsLessThanZero(double d)
+    {
+      return !IsZero(d) && d < -0.001;
     }
 
     public override GH_Exposure Exposure => GH_Exposure.tertiary;
