@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Remoting.Messaging;
 using Grasshopper.Kernel;
 using Rhino;
 using Rhino.Geometry;
@@ -46,7 +45,7 @@ namespace Bella.Components
 
       // Extrusion distance
       var distance = RhinoMath.UnsetValue;
-      if (!data.GetData(1, ref distance) || Math.Abs(distance) < RhinoMath.ZeroTolerance) return;
+      if (!data.GetData(1, ref distance) || IsZero(distance)) return;
 
       // Extrude curve on both sides
       var both_sides = false;
@@ -66,9 +65,8 @@ namespace Bella.Components
 
       if (up)
       {
-        // If zaxis points down, flip it
-        var z_zero = IsZero(plane.ZAxis.Z);
-        if (!z_zero && IsLessThanZero(plane.ZAxis.Z))
+        // If normal points downwards, reverse it
+        if (IsLessThanZero(plane.ZAxis.Z))
           normal.Reverse();
       }
 
@@ -122,14 +120,20 @@ namespace Bella.Components
       data.SetData(0, brep);
     }
 
+    /// <summary>
+    /// Returns true if the input is zero within tolerance
+    /// </summary>
     private static bool IsZero(double d)
     {
-      return Math.Abs(d) < 0.001;
+      return Math.Abs(d) < RhinoMath.ZeroTolerance;
     }
 
+    /// <summary>
+    /// Returns true if the input is less than zero within tolerance
+    /// </summary>
     private static bool IsLessThanZero(double d)
     {
-      return !IsZero(d) && d < -0.001;
+      return !IsZero(d) && d < -RhinoMath.ZeroTolerance;
     }
 
     public override GH_Exposure Exposure => GH_Exposure.tertiary;
