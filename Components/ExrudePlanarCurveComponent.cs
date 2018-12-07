@@ -12,28 +12,28 @@ namespace Bella.Components
     {
     }
 
-    protected override void RegisterInputParams(GH_InputParamManager input)
+    protected override void RegisterInputParams(GH_InputParamManager pManager)
     {
-      input.AddCurveParameter("Curve", "C", "Planar curve to extrude", GH_ParamAccess.item);
-      input.AddNumberParameter("Distance", "D", "Extrusion distance", GH_ParamAccess.item, 1.0);
-      input.AddBooleanParameter("BothSides", "B", "Extrude curve on both sides", GH_ParamAccess.item, false);
-      input.AddBooleanParameter("Solid", "S", "Create a closed solid if curve is closed", GH_ParamAccess.item, false);
-      input.AddBooleanParameter("Up", "U", "Extrude in up direction", GH_ParamAccess.item, false);
+      pManager.AddCurveParameter("Curve", "C", "Planar curve to extrude", GH_ParamAccess.item);
+      pManager.AddNumberParameter("Distance", "D", "Extrusion distance", GH_ParamAccess.item, 1.0);
+      pManager.AddBooleanParameter("BothSides", "B", "Extrude curve on both sides", GH_ParamAccess.item, false);
+      pManager.AddBooleanParameter("Solid", "S", "Create a closed solid if curve is closed", GH_ParamAccess.item, false);
+      pManager.AddBooleanParameter("Up", "U", "Extrude in up direction", GH_ParamAccess.item, false);
     }
 
-    protected override void RegisterOutputParams(GH_OutputParamManager output)
+    protected override void RegisterOutputParams(GH_OutputParamManager pManager)
     {
-      output.AddBrepParameter("Extrusion", "E", "Extrusion results", GH_ParamAccess.item);
+      pManager.AddBrepParameter("Extrusion", "E", "Extrusion results", GH_ParamAccess.item);
     }
 
-    protected override void SolveInstance(IGH_DataAccess data)
+    protected override void SolveInstance(IGH_DataAccess DA)
     {
       var tolerance = RhinoDoc.ActiveDoc.ModelAbsoluteTolerance;
       var angle_tolerance = RhinoDoc.ActiveDoc.ModelAngleToleranceRadians;
 
       // Planar curve to extrude
       Curve curve = null;
-      if (!data.GetData(0, ref curve))
+      if (!DA.GetData(0, ref curve))
         return;
 
       // Verify curve is planar
@@ -45,19 +45,19 @@ namespace Bella.Components
 
       // Extrusion distance
       var distance = RhinoMath.UnsetValue;
-      if (!data.GetData(1, ref distance) || IsZero(distance)) return;
+      if (!DA.GetData(1, ref distance) || IsZero(distance)) return;
 
       // Extrude curve on both sides
       var both_sides = false;
-      if (!data.GetData(2, ref both_sides)) return;
+      if (!DA.GetData(2, ref both_sides)) return;
 
       // Create a closed solid if curve is closed
       var solid = false;
-      if (!data.GetData(3, ref solid)) return;
+      if (!DA.GetData(3, ref solid)) return;
 
       // Extrude up
       var up = false;
-      if (!data.GetData(4, ref up)) return;
+      if (!DA.GetData(4, ref up)) return;
 
       // Extrusion direction
       var normal = plane.Normal;
@@ -117,7 +117,7 @@ namespace Bella.Components
       }
 
       // Set result
-      data.SetData(0, brep);
+      DA.SetData(0, brep);
     }
 
     /// <summary>
