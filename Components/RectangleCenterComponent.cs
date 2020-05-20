@@ -20,6 +20,7 @@ namespace Bella.Components
       pManager.AddNumberParameter("Y Size", "Y", "Dimensions of rectangle in plane y direction.", GH_ParamAccess.item, 1.0);
       pManager.AddNumberParameter("Radius", "R", "Rectangle corner fillet radius", GH_ParamAccess.item, 0.0);
     }
+    
     protected override void RegisterOutputParams(GH_Component.GH_OutputParamManager pManager)
     {
       pManager.AddGenericParameter("Rectangle", "R", "Rectangle", GH_ParamAccess.item);
